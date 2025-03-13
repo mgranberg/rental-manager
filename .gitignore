@@ -1,0 +1,72 @@
+# .NET specific
+# Ignore build directories
+bin/
+obj/
+
+# Ignore Visual Studio temporary files, directories, and files
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# User-specific files
+*.user
+*.vspscc
+# User-specific temporary files
+*.tmp
+*.bak
+*.swp
+
+# ASP.NET Core
+project.lock.json
+project.fragment.lock.json
+app.db               # SQLite database file (you may want to keep this in dev environments, but usually ignored)
+*.db
+
+# JetBrains Rider
+.idea/
+
+# NPM / Node.js specific (Nuxt.js)
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Nuxt.js build directories
+.nuxt/
+dist/
+
+# .env file (You may want to keep .env files local but ignore them from git)
+.env
+.env.*               # For other env-related files
+*.env
+
+# Log files
+*.log
+
+# SQLite specific
+*.sqlite
+*.sqlite3
+
+# VS Code specific
+.vscode/
+
+# IDE-specific
+*.sublime-workspace
+*.sublime-project
+
+# Windows Installer files
+Thumbs.db
+Desktop.ini
+
+# macOS specific
+.DS_Store
+
+# Linux specific
+*.swp
+
+# Ignore package lock files for nuxt if using yarn
+package-lock.json
