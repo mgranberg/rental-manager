@@ -21,11 +21,15 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // services
 builder.Services.AddScoped<ISeedService, SeedService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
+builder.Services.AddScoped<ICarsService, CarsService>();
+builder.Services.AddScoped<ICarTypeService, CarTypeService>();
 
 var app = builder.Build();
 
 app.MapSeedEndpoints();
 app.MapCarsEndpoints();
 app.MapBookingsEndpoint();
+app.MapCarTypesEndpoints();
+app.MapSettingsEndpoints();
 
 app.Run();

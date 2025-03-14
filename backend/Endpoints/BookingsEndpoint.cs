@@ -50,7 +50,7 @@ public static class BookingsEndpoint
             return Results.Created($"/bookings/{result.Id}", result);
         });
 
-        app.MapPut("/bookings/return/{identifier}", async (HttpContext context) =>
+        app.MapPost("/bookings/return/{identifier}", async (HttpContext context) =>
         {
             var dbContext = context.RequestServices.GetRequiredService<AppDbContext>();
             var bookingService = context.RequestServices.GetRequiredService<IBookingService>();
@@ -65,11 +65,11 @@ public static class BookingsEndpoint
             Booking? bookingToReturn = null;
             if (int.TryParse(identifier, out var id))
             {
-                bookingToReturn = await dbContext.Bookings.Include(b => b.Car).FirstOrDefaultAsync(b => b.Id == id);
+                bookingToReturn = await dbContext.Bookings.Include(b => b.Car).Include(b => b.CarType).FirstOrDefaultAsync(b => b.Id == id);
             }
             else
             {
-                bookingToReturn = await dbContext.Bookings.Include(b => b.Car).FirstOrDefaultAsync(b => b.BookingNumber == identifier);
+                bookingToReturn = await dbContext.Bookings.Include(b => b.Car).Include(b => b.CarType).FirstOrDefaultAsync(b => b.BookingNumber == identifier);
             }
 
             if (bookingToReturn == null)

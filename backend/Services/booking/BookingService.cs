@@ -30,7 +30,7 @@ public class BookingService : IBookingService
          var newBooking = new Booking
             {
                 CarId = bookingToAdd.Car.Id,
-                CarTypeId = bookingToAdd.Car.CarTypeId,
+                CarTypeId = bookingToAdd.Car.CarType.Id,
                 StartDate = bookingToAdd.StartDate,
                 StartingMileage = bookingToAdd.Car.Mileage,
                 EndDate = bookingToAdd.EndDate,
@@ -46,14 +46,19 @@ public class BookingService : IBookingService
 
     public async Task<Booking> ReturnBookingAsync(Booking booking, int ReturnMileage)
     {
+        var settings = await _dbContext.Settings.FirstOrDefaultAsync();
+        if (settings == null)
+        {
+            throw new Exception("Settings not found");
+        }
 
 
         booking.EndDate = DateTime.Now;
-        booking.TotalPrice = PriceHelper.CalculatePrice(100, 2, booking.StartDate, booking.EndDate, booking.StartingMileage, booking.EndingMileage, booking.Car.CarType);
         booking.Status = BookingStatus.Returned;
         booking.ReturnDate = DateTime.Now;
         booking.Status = BookingStatus.Returned;
         booking.EndingMileage = ReturnMileage;
+        booking.TotalPrice = PriceHelper.CalculatePrice(settings.BaseDailyFee, settings.KmFee, booking.StartDate, booking.EndDate, booking.StartingMileage, ReturnMileage, booking.Car.CarType);
 
         _dbContext.Bookings.Update(booking);
         await _dbContext.SaveChangesAsync();

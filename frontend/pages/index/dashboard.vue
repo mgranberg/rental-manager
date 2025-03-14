@@ -1,11 +1,13 @@
 <template>
   <div class="grid grid-flow-row gap-5">
-    <CarCard v-for="car in cars" :car="car" />
+    <CarCard v-for="car in store.getRentedCars" :car="car" />
   </div>
 </template>
 
 <script lang="ts" setup>
-const { data: cars, status, error, refresh } = await useFetch('/api/cars');
+import { useCarsStore } from '~/stores/car.store';
+
+const store = useCarsStore();
 </script>
 
 <style lang="scss" scoped>

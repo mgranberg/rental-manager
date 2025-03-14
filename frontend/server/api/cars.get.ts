@@ -1,5 +1,4 @@
 export default defineEventHandler(async (event) => {
   const config = useRuntimeConfig();
-  const baseUrl = config.public.baseUrl;
-  return await $fetch(`${baseUrl}/cars`);
+  return await $fetch(`http://localhost:5000/cars`);
 })

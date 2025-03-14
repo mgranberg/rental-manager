@@ -25,6 +25,7 @@ public class Booking : BaseEntity
     public required int StartingMileage { get; set; }
     public int EndingMileage { get; set; }
     
+    // Fråga Samuel
     public Booking()
     {
         BookingNumber = GenerateBookingNumber();

@@ -23,5 +23,15 @@ public static class SeedEndpoints
         {
           return await seedService.SeedCarsAsync();
         });
+
+        app.MapPost("/seed/settings", async (ISeedService seedService) =>
+        {
+          return await seedService.SeedSettingsAsync();
+        });
+
+        app.MapPost("/seed/unseed", async (ISeedService seedService) =>
+        {
+            return await seedService.UnSeedAsync();
+        });
     }
 }

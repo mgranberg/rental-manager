@@ -1,29 +1,25 @@
 <template>
-  <section class="mb-4">
-    <UFormGroup label="Filtrera på datum">
-      <VueDatePicker v-model="date" :range="{fixedStart: true}"></VueDatePicker>
-    </UFormGroup>
-  </section>
+  <div class="grid gap-5">
+    <h1 class="text-xl flex justify-between">Available cars
+    <UBadge size="lg" class="w-fit">Count: {{ availableCars?.length ?? 0 }}</UBadge></h1>
+    
+    <UDivider />
 
-  <section class="grid grid-flow-row gap-4">
-
-    <UCard v-if="status === 'pending'">
-      <p>Laddar...</p>
-    </UCard>
-    <UCard v-else-if="status === 'error'">
-      <p>{{ error }}</p>
-    </UCard>
-    <CarCard v-else v-for="car in availableCars" :key="car" :car="car" @rent="rentCar(car)"></CarCard>
-  </section>
-  <UModal v-model="isOpen">
+    <div class="grid grid-flow-row gap-5">
+      <CarCard v-for="car in availableCars" :key="car.id" :car="car" @rent="rentCar(car)"></CarCard>
+    </div>
+  </div>
+  <UModal v-model="isOpen" class="relative">
+    <UButton icon="i-material-symbols-cancel-outline" class="absolute top-2 right-2" color="red"></UButton>
     <UCard>
-      <div class="p-4" v-if="bookingData.status === 'none' && bookingData.selectedCar">
-        <h1 class="text-3xl">Bekräfta bokning</h1>
-        <p class="text-sm">Du har valt att boka en {{ bookingData.selectedCar?.make }} {{ bookingData.selectedCar?.model }} från {{ date[0] }} till {{ date[1] }}.</p>
-        <UFormGroup label="Personnummer">
+      <div class="p-4 grid gap-3" v-if="bookingData.status === 'none' && bookingData.selectedCar">
+        <h1 class="text-3xl">Confirm booking</h1>
+        <UFormGroup label="Choose date">
+          <VueDatePicker v-model="date" :range="{fixedStart: true}"></VueDatePicker>
+        </UFormGroup>
+        <UFormGroup label="Social security number">
           <UInput v-model="customerSsn" placeholder="YYYYMMDD-XXXX" />
         </UFormGroup>
-        <UButton color="primary" @click="onPublishBooking()" >Bekräfta bokning</UButton>
       </div>
       <div v-if="bookingData.status == 'pending'" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
         Bokar...
@@ -35,7 +31,8 @@
         <p>Bokning lyckades!</p>
       </div>
       <template #footer>
-        <div class="flex gap-2">
+        <div class="flex gap-2 justify-between">
+          <UButton color="primary" @click="onPublishBooking()" >Bekräfta bokning</UButton>
           <UButton color="red" @click="isOpen = false">Avbryt</UButton>
         </div>
       </template>
@@ -44,7 +41,8 @@
 </template>
 
 <script lang="ts" setup>
-import type { Car } from '~/Types/Car.type';
+import type { Car } from '~/types/Car.type';
+
 const bookingData = ref({
   customerSsn: '',
   status: 'none' as 'none' | 'pending' | 'error' | 'success',
@@ -52,21 +50,34 @@ const bookingData = ref({
   selectedCar: null as Car | null
 })
 const isOpen = ref(false);
+
+watch(isOpen, (val) => {
+  if (!val) {
+    abortRent();
+  }
+});
 const startDate = new Date();
 const endDate = new Date(new Date().setDate(startDate.getDate() + 2));
 const date = ref([startDate, endDate]);
-const { data: availableCars, status, error, refresh } = await useFetch('api/availableCars/', {
-  method: 'POST',
-  body: {
-    startDate: date.value[0],
-    endDate: date.value[1]
-  },
-  watch: [date]
+const { data: availableCars, status, error, refresh } = await useFetch<Car[]>('/api/cars', {
+  method: 'get',
+  watch: [date],
+  transform: (data) => data.filter((car) => {
+    return !car.bookingId;
+  })
 })
 
 const rentCar = (car: Car) => {
   bookingData.value.selectedCar = car;
   isOpen.value = true;
+}
+
+const abortRent = () => {
+  bookingData.value.selectedCar = null;
+  bookingData.value.status = 'none';
+  bookingData.value.error = '';
+  bookingData.value.customerSsn = '';
+  isOpen.value = false;
 }
 
 const customerSsn = ref('');

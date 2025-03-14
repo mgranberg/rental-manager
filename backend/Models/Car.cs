@@ -17,4 +17,5 @@ public class Car : BaseEntity
     public int FuelTypeId { get; set; }
     public required FuelType FuelType { get; set; }
     public int Mileage { get; set; }
+    public string? ImageUrl { get; set; }
 }

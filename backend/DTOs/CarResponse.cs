@@ -11,5 +11,6 @@ public class CarResponse
     public required string Model { get; set; }
     public required int Year { get; set; }
     public string? Color { get; set; }
+    public int? BookingId { get; set; }
 
 }
