@@ -10,7 +10,7 @@
     </div>
   </div>
   <UModal v-model="isOpen" class="relative">
-    <UButton icon="i-material-symbols-cancel-outline" class="absolute top-2 right-2" color="red"></UButton>
+    <UButton icon="i-material-symbols-cancel-outline" class="absolute top-2 right-2" color="red" @click="abortRent"></UButton>
     <UCard>
       <div class="p-4 grid gap-3" v-if="bookingData.status === 'none' && bookingData.selectedCar">
         <h1 class="text-3xl">Confirm booking</h1>
@@ -32,8 +32,9 @@
       </div>
       <template #footer>
         <div class="flex gap-2 justify-between">
-          <UButton color="primary" @click="onPublishBooking()" >Bekräfta bokning</UButton>
-          <UButton color="red" @click="isOpen = false">Avbryt</UButton>
+          <UButton color="primary" @click="onPublishBooking()" v-if="bookingData.status != 'success'">Bekräfta bokning</UButton>
+          <UButton color="primary" @click="abortRent" v-if="bookingData.status === 'success'">Stäng</UButton>
+          <UButton color="red" @click="isOpen = false" v-if="bookingData.status != 'success'">Avbryt</UButton>
         </div>
       </template>
     </UCard>

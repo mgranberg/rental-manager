@@ -17,7 +17,21 @@ public static class CarTypesEndpoints
 
         app.MapPost("/cartypes", async (ICarTypeService carTypeService, CarType carType) =>
         {
-            return await carTypeService.AddCarTypeAsync(carType);
+            if (carType.Id != 0)
+            {
+                return Results.BadRequest("Id must be 0");
+            }
+
+            if (carType.Multiplier < 1)
+            {
+                return Results.BadRequest("Multiplier must be greater than 1");
+            }
+
+            if (carType.Name == null)
+            {
+                return Results.BadRequest("Name must not be null");
+            }
+            return Results.Ok(await carTypeService.AddCarTypeAsync(carType));
         });
 
         app.MapPut("/cartypes", async (ICarTypeService carTypeService, CarType carType) =>

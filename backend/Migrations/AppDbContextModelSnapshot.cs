@@ -50,7 +50,7 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CarTypes");
+                    b.ToTable("CarTypes", (string)null);
                 });
 
             modelBuilder.Entity("Models.DB.Booking", b =>
@@ -109,7 +109,7 @@ namespace backend.Migrations
 
                     b.HasIndex("CarTypeId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("Models.DB.Car", b =>
@@ -167,7 +167,7 @@ namespace backend.Migrations
 
                     b.HasIndex("FuelTypeId");
 
-                    b.ToTable("Cars");
+                    b.ToTable("Cars", (string)null);
                 });
 
             modelBuilder.Entity("Models.DB.FuelType", b =>
@@ -191,7 +191,7 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FuelTypes");
+                    b.ToTable("FuelTypes", (string)null);
                 });
 
             modelBuilder.Entity("Models.DB.Setting", b =>
@@ -217,7 +217,7 @@ namespace backend.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Settings");
+                    b.ToTable("Settings", (string)null);
                 });
 
             modelBuilder.Entity("Models.DB.Booking", b =>

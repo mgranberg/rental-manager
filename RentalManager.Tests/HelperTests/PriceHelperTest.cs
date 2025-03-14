@@ -78,6 +78,30 @@ public class PriceHelperTest
     }
 
     [Test]
+    public void CalculatePrice_ShouldReturnCorrectPrice_AnotherType()
+    {
+        // Arrange
+        decimal basePrice = 100m;
+        decimal basePriceMileage = 2m;
+        DateTime startDate = new DateTime(2025, 3, 13, 9, 0, 0); // 9 AM
+        DateTime endDateBefore7 = new DateTime(2025, 3, 15, 6, 0, 0); // 6 AM
+        DateTime endDateAfter7 = new DateTime(2025, 3, 15, 7, 0, 0); // 7 AM
+        int startingMileage = 1000;
+        int endingMileage = 1500;
+        CarType carType = new() { Name = "AnotherType", Multiplier = 2m, MultiplyDays = false, MultiplyMileage = true, PayForMileage = true };
+
+        // Act
+        decimal resultBefore7 = PriceHelper.CalculatePrice(basePrice, basePriceMileage, startDate, endDateBefore7, startingMileage, endingMileage, carType);
+        decimal resultAfter7 = PriceHelper.CalculatePrice(basePrice, basePriceMileage, startDate, endDateAfter7, startingMileage, endingMileage, carType);
+
+        // Assert
+        // 100 * 2 + 2 * 500 * 2 = 2200
+        Assert.That(resultBefore7, Is.EqualTo(2200m));
+        // 100 * 3 + 2 * 500 * 2 = 2300
+        Assert.That(resultAfter7, Is.EqualTo(2300m));
+    }
+
+    [Test]
     public void CalculateNumberOfFullDays_ShouldReturnCorrectNumberOfDays()
     {
         // Arrange
