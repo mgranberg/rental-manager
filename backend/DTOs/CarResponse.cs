@@ -1,3 +1,5 @@
+using Models.DB;
+
 public class CarResponse
 {
     public int Id { get; set; }

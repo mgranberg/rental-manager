@@ -1,4 +1,6 @@
 using backend.Data;
+using backend.Repositories.Interfaces;
+using backend.Services;
 using Microsoft.EntityFrameworkCore;
 using Models.DB;
 
@@ -8,24 +10,21 @@ public static class SettingsEndpoint
 {
     public static void MapSettingsEndpoints(this WebApplication app)
     {
-        app.MapGet("/settings", async (AppDbContext context) =>
+        app.MapGet("/settings", async (ISettingService settingService) =>
         {
-            return await context.Settings.FirstOrDefaultAsync();
+            return await settingService.GetFirstSettingAsync();
         });
 
-        app.MapPut("/settings", async (AppDbContext context, Setting setting) =>
+        app.MapPut("/settings", async (ISettingRepository settingRepository, Setting setting) =>
         {
-            var settingToUpdate = await context.Settings.FindAsync(setting.Id);
+            var settingToUpdate = await settingRepository.GetByIdAsync(setting.Id);
             if (settingToUpdate == null)
             {
                 return Results.NotFound();
             }
-             // Detach the existing entity
-            context.Entry(settingToUpdate).State = EntityState.Detached;
 
             settingToUpdate = setting;
-            context.Settings.Update(settingToUpdate);
-            await context.SaveChangesAsync();
+            await settingRepository.UpdateAsync(settingToUpdate);
             return Results.Ok();
         });
     }

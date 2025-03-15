@@ -8,29 +8,14 @@ public static class CarsEndpoints
 {
     public static void MapCarsEndpoints(this WebApplication app)
     {
-        app.MapGet("/cars", async (HttpContext context) =>
+        app.MapGet("/cars", async (ICarService carService) =>
         {
-            var dbContext = context.RequestServices.GetRequiredService<AppDbContext>();
-            var CarsService = context.RequestServices.GetRequiredService<ICarsService>();
-            return await CarsService.GetCarsAsync();
+            return await carService.GetCarsAsync();
         });
 
-        app.MapPost("/cars/availableCars", async (AppDbContext dbContext, AvailableCarsRequest availableCarsRequest) =>
+        app.MapPost("/cars/availableCars", async (ICarService carService) =>
         {
-
-            var bookedCarsIds = await dbContext.Bookings
-                .Where(b => b.Status == BookingStatus.Rented)
-                .Select(b => b.CarId)
-                .ToListAsync();
-
-            // Filter out cars that are already booked
-            var availableCars = await dbContext.Cars
-                .Include(c => c.CarType)
-                .Include(c => c.FuelType)
-                .Where(c => !bookedCarsIds.Contains(c.Id))
-                .ToListAsync();
-
-            return Results.Ok(availableCars);
+            return await carService.GetAvailableCarsAsync();
         });
 
     }

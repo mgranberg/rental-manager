@@ -1,66 +1,35 @@
 
-using backend.Data;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
+using backend.Repositories.Interfaces;
+using Models.DB;
 
 namespace backend.Services;
 
-public class CarTypeService : ICarTypeService
+public class CarTypeService(ICarTypeRepository carTypeRepository) : ICarTypeService
 {
-    private readonly AppDbContext _dbContext;
+    private readonly ICarTypeRepository _carTypeRepository = carTypeRepository;
 
-    public CarTypeService(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
     public async Task<CarType> AddCarTypeAsync(CarType carType)
     {
-        await _dbContext.CarTypes.AddAsync(carType);
-        await _dbContext.SaveChangesAsync();
-        return carType;
+        return await _carTypeRepository.CreateAsync(carType);
     }
 
     public async Task<CarType> DeleteCarTypeAsync(int carTypeId)
     {
-        await _dbContext.CarTypes.FindAsync(carTypeId);
-        var carType = await _dbContext.CarTypes.FindAsync(carTypeId);
-        if (carType == null)
-        {
-            throw new Exception("Car type not found");
-        }
-        _dbContext.CarTypes.Remove(carType);
-        await _dbContext.SaveChangesAsync();
-        return carType;
+        return await _carTypeRepository.DeleteAsync(carTypeId);
     }
 
     public async Task<CarType> GetCarTypeAsync(int carTypeId)
     {
-        var carType = await _dbContext.CarTypes.FindAsync(carTypeId);
-
-        if (carType == null)
-        {
-            throw new Exception("Car type not found");
-        }
-        return carType;
+        return await _carTypeRepository.GetByIdAsync(carTypeId);
     }
 
     public async Task<IEnumerable<CarType>> GetCarTypesAsync()
     {
-        return await _dbContext.CarTypes.ToListAsync();
+        return await _carTypeRepository.GetAllAsync();
     }
 
     public async Task<CarType> UpdateCarTypeAsync(CarType carType)
     {
-        var carTypeToUpdate = await _dbContext.CarTypes.FindAsync(carType.Id);
-        if (carTypeToUpdate == null)
-        {
-            throw new Exception("Car type not found");
-        }
-        
-        _dbContext.Entry(carTypeToUpdate).State = EntityState.Detached;
-        carTypeToUpdate = carType;
-        _dbContext.CarTypes.Update(carTypeToUpdate);
-        await _dbContext.SaveChangesAsync();
-        return carTypeToUpdate;
+        return await _carTypeRepository.UpdateAsync(carType);
     }
 }

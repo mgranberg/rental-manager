@@ -1,3 +1,5 @@
+using Models.DB;
+
 namespace backend.Services;
 public interface ICarTypeService
 {

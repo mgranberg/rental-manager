@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using Models.DB;
 
+namespace Models.DB;
 public class CarType : BaseEntity
 {
     public required string Name { get; set; }

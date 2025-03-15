@@ -9,23 +9,13 @@ public static class BookingsEndpoint
 {
     public static void MapBookingsEndpoint(this WebApplication app)
     {
-        app.MapGet("/bookings", async (HttpContext context) =>
+        app.MapGet("/bookings", async (IBookingService bookingService) =>
         {
-            var bookingService = context.RequestServices.GetRequiredService<IBookingService>();
             return await bookingService.GetBookingsAsync();
         });
 
-        app.MapGet("/bookings/{id}", async (HttpContext context) =>
+        app.MapGet("/bookings/{id}", async (IBookingService bookingService, int id) =>
         {
-            var dbContext = context.RequestServices.GetRequiredService<AppDbContext>();
-            var bookingService = context.RequestServices.GetRequiredService<IBookingService>();
-            
-            var idValue = context.Request.RouteValues["id"] as string;
-            if (idValue == null || !int.TryParse(idValue, out var id))
-            {
-                return Results.BadRequest("Invalid booking ID");
-            }
-
             var booking = await bookingService.GetBookingAsync(id);
 
             if (booking == null)
@@ -35,18 +25,14 @@ public static class BookingsEndpoint
             return Results.Ok(booking);
         });
 
-        app.MapPost("/bookings", async (HttpContext context) =>
+        app.MapPost("/bookings", async (IBookingService bookingService, AddBookingRequest bookingRequest) =>
         {
-            var dbContext = context.RequestServices.GetRequiredService<AppDbContext>();
-            var bookingService = context.RequestServices.GetRequiredService<IBookingService>();
-            var booking = await context.Request.ReadFromJsonAsync<AddBookingRequest>();
-
-            if (booking == null)
+            if (bookingRequest == null)
             {
                 return Results.BadRequest("Invalid request body");
             }
 
-            var result = await bookingService.CreateBookingAsync(booking);
+            var result = await bookingService.CreateBookingAsync(bookingRequest);
             return Results.Created($"/bookings/{result.Id}", result);
         });
 

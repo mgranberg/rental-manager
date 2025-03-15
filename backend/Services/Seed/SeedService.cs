@@ -1,15 +1,13 @@
-using backend.Data;
-using Microsoft.EntityFrameworkCore;
+using backend.Repositories.Interfaces;
 using Models.DB;
-namespace backend.Services;
-public class SeedService : ISeedService
-{
-    private readonly AppDbContext _context;
 
-    public SeedService(AppDbContext context)
-    {
-        _context = context;
-    }
+namespace backend.Services;
+public class SeedService(ISettingRepository settingRepository, ICarTypeRepository carTypeRepository, IFuelTypeRepository fuelTypeRepository, ICarRepository carRepository) : ISeedService
+{
+    private readonly ISettingRepository _settingRepository = settingRepository;
+    private readonly ICarTypeRepository _cartypeRepository = carTypeRepository;
+    private readonly IFuelTypeRepository _fuelTypeRepository = fuelTypeRepository;
+    private readonly ICarRepository _carRepository = carRepository;
 
     public async Task<IResult> SeedAsync()
     {
@@ -23,24 +21,22 @@ public class SeedService : ISeedService
     public async Task<IResult> SeedCarTypesAsync()
     {
         var carTypes = new List<CarType> {
-            new CarType { Name = "Småbil", Multiplier = 1.0m, MultiplyDays = false, MultiplyMileage = false, PayForMileage = false },
-            new CarType { Name = "Kombi", Multiplier = 1.3m, MultiplyDays = true, MultiplyMileage = false, PayForMileage = true },
-            new CarType { Name = "Lastbil", Multiplier = 1.5m, MultiplyDays = true, MultiplyMileage = true, PayForMileage = true }
+            new CarType { Name = "Compact", Multiplier = 1.0m, MultiplyDays = false, MultiplyMileage = false, PayForMileage = false },
+            new CarType { Name = "Combi", Multiplier = 1.3m, MultiplyDays = true, MultiplyMileage = false, PayForMileage = true },
+            new CarType { Name = "Truck", Multiplier = 1.5m, MultiplyDays = true, MultiplyMileage = true, PayForMileage = true }
         };
-        await _context.CarTypes.AddRangeAsync(carTypes);
-        await _context.SaveChangesAsync();
+        var result = await _cartypeRepository.CreateRangeAsync(carTypes);
         return Results.Created("/seed/cartypes", carTypes);
     }
 
     public async Task<IResult> SeedFuelTypesAsync()
     {
         var fuelTypes = new List<FuelType> {
-            new FuelType { Name = "Bensin" },
+            new FuelType { Name = "Gasoline" },
             new FuelType { Name = "Diesel" },
-            new FuelType { Name = "El" }
+            new FuelType { Name = "Electric" }
         };
-        await _context.FuelTypes.AddRangeAsync(fuelTypes);
-        await _context.SaveChangesAsync();
+        var result = await _fuelTypeRepository.CreateRangeAsync(fuelTypes);
         return Results.Created("/seed/fueltypes", fuelTypes);
     }
 
@@ -50,9 +46,10 @@ public class SeedService : ISeedService
         var fuelTypes = new List<FuelType>();
         try
         {
-            carTypes = await _context.CarTypes.ToListAsync();
-            fuelTypes = await _context.FuelTypes.ToListAsync();
-            if (carTypes.Count == 0 || fuelTypes.Count == 0)
+            carTypes = await _cartypeRepository.GetAllAsync() as List<CarType>;
+            fuelTypes = await _fuelTypeRepository.GetAllAsync() as List<FuelType>;
+
+            if (carTypes is null || carTypes.Count == 0 || fuelTypes is null|| fuelTypes.Count == 0)
             {
                 return Results.BadRequest("No car types or fuel types found. Please seed car types and fuel types first.");
             }
@@ -72,8 +69,8 @@ public class SeedService : ISeedService
             new Car { Make = "Volkswagen", Model = "Caddy", Year = 2024, CarType = carTypes[2], LicensePlate = "YZA567", Seats = 3 , FuelType = fuelTypes[1], Mileage = 3000, ImageUrl = "" },
             new Car { Make = "Volkswagen", Model = "Transporter", Year = 2025, CarType = carTypes[2], LicensePlate = "BCD890", Seats = 3, FuelType = fuelTypes[1], Mileage = 4000, ImageUrl = "" }
         };
-        await _context.Cars.AddRangeAsync(cars);
-        await _context.SaveChangesAsync();
+        
+        await _carRepository.CreateRangeAsync(cars);
         return Results.Created("/seed/cars", cars);
     }
 
@@ -85,17 +82,16 @@ public class SeedService : ISeedService
             KmFee = 1m
         };
 
-        _context.Settings.Add(Setting);
-        await _context.SaveChangesAsync();
+        await _settingRepository.CreateAsync(Setting);
         return Results.Created("/seed/settings", Setting);
     }
     public async Task<IResult> UnSeedAsync()
     {
-        _context.CarTypes.RemoveRange(_context.CarTypes);
-        _context.FuelTypes.RemoveRange(_context.FuelTypes);
-        _context.Cars.RemoveRange(_context.Cars);
-        _context.Settings.RemoveRange(_context.Settings);
-        await _context.SaveChangesAsync();
+        await _cartypeRepository.DeleteRangeAsync(await _cartypeRepository.GetAllAsync());
+        await _fuelTypeRepository.DeleteRangeAsync(await _fuelTypeRepository.GetAllAsync());
+        await _carRepository.DeleteRangeAsync(await _carRepository.GetAllAsync());
+        await _settingRepository.DeleteRangeAsync(await _settingRepository.GetAllAsync());
+
         return Results.Ok("All tables cleared");
     }
 }

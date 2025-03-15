@@ -1,52 +1,47 @@
 
-using backend.Data;
+using backend.Repositories.Interfaces;
 using Helpers;
-using Microsoft.EntityFrameworkCore;
 using Models.DB;
 
 namespace backend.Services;
 
-public class BookingService : IBookingService
+public class BookingService(IBookingRepository bookingRepository, ISettingRepository settingRepository, ICarRepository carRepository) : IBookingService
 {
-    private readonly AppDbContext _dbContext;
-
-    public BookingService(AppDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly IBookingRepository _bookingRepository = bookingRepository;
+    private ISettingRepository _settingRepository = settingRepository;
+    private ICarRepository _carRepository = carRepository;
 
     public async Task<Booking?> GetBookingAsync(int bookingId)
     {
-        return await _dbContext.Bookings.FirstOrDefaultAsync(b => b.Id == bookingId);
+        return await _bookingRepository.GetByIdAsync(bookingId);
     }
 
     public async Task<IEnumerable<Booking>> GetBookingsAsync()
     {
-        return await _dbContext.Bookings.Include(b => b.Car).ToListAsync();
+        return await _bookingRepository.GetAllAsync();
     }
 
     public async Task<Booking> CreateBookingAsync(AddBookingRequest bookingToAdd)
     {
-         var newBooking = new Booking
-            {
-                CarId = bookingToAdd.Car.Id,
-                CarTypeId = bookingToAdd.Car.CarType.Id,
-                StartDate = bookingToAdd.StartDate,
-                StartingMileage = bookingToAdd.Car.Mileage,
-                EndDate = bookingToAdd.EndDate,
-                EncryptedCustomerSsn = EncryptionHelper.Encrypt(bookingToAdd.CustomerSsn),
-                Status = BookingStatus.Rented,
-                ReturnDate = null,
-            };
-            await _dbContext.Bookings.AddAsync(newBooking);
-            await _dbContext.SaveChangesAsync();
-            return newBooking;
+        var newBooking = new Booking
+        {
+            CarId = bookingToAdd.Car.Id,
+            CarTypeId = bookingToAdd.Car.CarType.Id,
+            StartDate = bookingToAdd.StartDate,
+            StartingMileage = bookingToAdd.Car.Mileage,
+            EndDate = bookingToAdd.EndDate,
+            EncryptedCustomerSsn = EncryptionHelper.Encrypt(bookingToAdd.CustomerSsn),
+            Status = BookingStatus.Rented,
+            ReturnDate = null,
+        };
+        
+        return await _bookingRepository.CreateAsync(newBooking);
     }
 
 
     public async Task<Booking> ReturnBookingAsync(Booking booking, int ReturnMileage)
     {
-        var settings = await _dbContext.Settings.FirstOrDefaultAsync();
+        var settings = (await _settingRepository.GetAllAsync()).FirstOrDefault();
         if (settings == null)
         {
             throw new Exception("Settings not found");
@@ -60,12 +55,11 @@ public class BookingService : IBookingService
         booking.EndingMileage = ReturnMileage;
         booking.TotalPrice = PriceHelper.CalculatePrice(settings.BaseDailyFee, settings.KmFee, booking.StartDate, booking.EndDate, booking.StartingMileage, ReturnMileage, booking.Car.CarType);
 
-        _dbContext.Bookings.Update(booking);
-        await _dbContext.SaveChangesAsync();
+        await _bookingRepository.UpdateAsync(booking);
         
-        booking.Car.Mileage = ReturnMileage;
-        _dbContext.Cars.Update(booking.Car);
-        await _dbContext.SaveChangesAsync();
+        var car = await _carRepository.GetByIdAsync(booking.CarId);
+        car.Mileage = ReturnMileage;
+        await _carRepository.UpdateAsync(car);
 
         return booking;
     }

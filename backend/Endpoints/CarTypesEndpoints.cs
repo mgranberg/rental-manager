@@ -1,4 +1,5 @@
 using backend.Services;
+using Models.DB;
 
 namespace backend.Endpoints;
 
@@ -12,6 +13,7 @@ public static class CarTypesEndpoints
         });
         app.MapGet("/cartypes/{carTypeId:int}", async (ICarTypeService carTypeService, int carTypeId) =>
         {
+            // TODO: validate carTypeId
             return await carTypeService.GetCarTypeAsync(carTypeId);
         });
 

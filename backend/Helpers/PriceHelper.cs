@@ -1,3 +1,5 @@
+using Models.DB;
+
 public static class PriceHelper
 {
     public static decimal CalculatePrice(decimal basePrice, decimal basePriceMileage,  DateTime startDate, DateTime endDate, int startingMileage, int endingMileage, CarType carType)

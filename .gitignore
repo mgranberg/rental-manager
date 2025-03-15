@@ -25,6 +25,8 @@ project.lock.json
 project.fragment.lock.json
 app.db               # SQLite database file (you may want to keep this in dev environments, but usually ignored)
 *.db
+*.db-shm
+*.db-wal
 
 # JetBrains Rider
 .idea/

@@ -1,3 +1,5 @@
+namespace Models.DB;
+
 public enum BookingStatus
 {
     None = 0,
