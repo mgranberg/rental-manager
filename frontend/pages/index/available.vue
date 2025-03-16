@@ -62,10 +62,11 @@ const endDate = new Date(new Date().setDate(startDate.getDate() + 2));
 const date = ref([startDate, endDate]);
 
 
-const { data: availableCars, status, error, refresh } = await useFetch<Car[]>('/api/cars/availableCars', {
-  method: 'get',
-  watch: [date],
-})
+const { data: availableCars, status, error, refresh } = await useFetch('/api/availableCars');
+console.log(availableCars);
+console.log(error);
+
+
 
 const rentCar = (car: Car) => {
   bookingData.value.selectedCar = car;
@@ -87,7 +88,7 @@ const onPublishBooking = async () => {
   await $fetch('api/bookings/', {
     method: 'POST',
     body: {
-      car: bookingData.value.selectedCar,
+      carId: bookingData.value.selectedCar?.id,
       startDate: date.value[0],
       endDate: date.value[1],
       customerSsn: customerSsn.value
@@ -99,9 +100,11 @@ const onPublishBooking = async () => {
     bookingData.value.error = '';
     refresh();
   }).catch((error) => {
+    console.log(error);
+    
     bookingData.value.status = 'error';
     bookingData.value.error = error;
-  })
+  });
 }
 </script>
 

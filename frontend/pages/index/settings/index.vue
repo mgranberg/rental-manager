@@ -1,45 +1,47 @@
 <template>
-  <UCard>
-    <template #header>
-      <h1 class="text-3xl">
-        Car types
-      </h1>      
-    </template>
-    <div>
-    <UTable 
-      :rows="cartypes"
-      :columns="carTypeColumns"
-      v-if="cartypes" 
-      :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No items.' }"
-      >
-      <template #actions-data="{ row }">
-        <UDropdown :items="items(row)">
-          <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
-        </UDropdown>
+  <div class="grid gap-5">
+    <UCard>
+      <template #header>
+        <h1 class="text-3xl">
+          Car types
+        </h1>      
       </template>
-    </UTable>
-    <UButton color="primary" @click="navigateTo('/settings/cartype/new')">Add new</UButton>
-    </div>
-
-  </UCard>
-  <UCard>
-    <template #header>
-      <h1 class="text-3xl">
-        Settings
-      </h1>      
-    </template>
-    <div class="grid grid-cols-2" v-if="settings">
-      <UFormGroup label="Base daily fee">
-        <UInput v-model="settings.baseDailyFee" type="number" />
-      </UFormGroup>
-      <UFormGroup label="Base mileage fee">
-        <UInput v-model="settings.kmFee" type="number" />
-      </UFormGroup>
-    </div>
-    <template #footer>
-      <UButton color="primary" @click="updateSettings">Update</UButton>      
-    </template>
-  </UCard>
+      <div>
+      <UTable 
+        :rows="cartypes"
+        :columns="carTypeColumns"
+        v-if="cartypes" 
+        :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No items.' }"
+        >
+        <template #actions-data="{ row }">
+          <UDropdown :items="items(row)">
+            <UButton color="gray" variant="ghost" icon="i-heroicons-ellipsis-horizontal-20-solid" />
+          </UDropdown>
+        </template>
+      </UTable>
+      <UButton color="primary" @click="navigateTo('/settings/cartype/new')">Add new</UButton>
+      </div>
+  
+    </UCard>
+    <UCard>
+      <template #header>
+        <h1 class="text-3xl">
+          Settings
+        </h1>      
+      </template>
+      <div class="grid grid-cols-2 gap-4" v-if="settings">
+        <UFormGroup label="Base daily fee">
+          <UInput v-model="settings.baseDailyFee" type="number" />
+        </UFormGroup>
+        <UFormGroup label="Base mileage fee">
+          <UInput v-model="settings.kmFee" type="number" />
+        </UFormGroup>
+      </div>
+      <template #footer>
+        <UButton color="primary" @click="updateSettings">Update</UButton>      
+      </template>
+    </UCard>
+  </div>
 </template>
 
 <script lang="ts" setup>

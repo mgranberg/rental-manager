@@ -107,8 +107,7 @@ public class EfCoreBookingRepository(AppDbContext dbContext) : IBookingRepositor
     {
         var bookingToUpdate = await _dbContext.Bookings.FindAsync(booking.Id);
         if (bookingToUpdate is null) return null;
-        bookingToUpdate = booking;
-        _dbContext.Bookings.Update(bookingToUpdate);
+        _dbContext.Entry(bookingToUpdate).CurrentValues.SetValues(booking);
         await _dbContext.SaveChangesAsync();
         return booking;
     }

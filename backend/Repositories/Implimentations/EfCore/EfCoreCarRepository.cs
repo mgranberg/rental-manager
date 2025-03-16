@@ -81,8 +81,7 @@ public class EfCoreCarRepository(AppDbContext dbContext) : ICarRepository
     {
         var carToUpdate = await _dbContext.Cars.FindAsync(car.Id);
         if (carToUpdate is null) return null;
-        carToUpdate = car;
-        _dbContext.Cars.Update(carToUpdate);
+        _dbContext.Entry(carToUpdate).CurrentValues.SetValues(car);
         await _dbContext.SaveChangesAsync();
         return car;
     }

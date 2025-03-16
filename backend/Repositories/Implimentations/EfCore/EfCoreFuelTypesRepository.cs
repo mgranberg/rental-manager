@@ -55,7 +55,7 @@ namespace backend.Repositories.Implimentations
         {
             var fuelTypeToUpdate = await _dbContext.FuelTypes.FindAsync(fuelType.Id);
             if (fuelTypeToUpdate is null) return null;
-            _dbContext.FuelTypes.Update(fuelType);
+            _dbContext.Entry(fuelTypeToUpdate).CurrentValues.SetValues(fuelType);
             await _dbContext.SaveChangesAsync();
             return fuelType;
         }

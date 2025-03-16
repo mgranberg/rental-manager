@@ -5,7 +5,7 @@
         <UInput v-model="state.name" />
       </UFormGroup>
       <UFormGroup label="Multiplier">
-        <UInput v-model="state.multiplier" type="number" :min="1" />
+        <UInput v-model="state.multiplier" type="number" :min="1" step="any" />
       </UFormGroup>
       <UFormGroup label="Multiply days">
         <UCheckbox v-model="state.multiplyDays" />
@@ -23,12 +23,13 @@
 
 <script lang="ts" setup>
   const state = reactive({
-    name: 'ny bil',
+    name: 'New Car Type',
     multiplier: 1,
     multiplyDays: false,
     multiplyMileage: false,
     payForMileage: false
   })
+
   const submit = async () => {
     await $fetch('/api/cartype/create', {
       method: 'POST',

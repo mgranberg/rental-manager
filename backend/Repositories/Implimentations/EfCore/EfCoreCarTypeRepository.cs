@@ -52,8 +52,8 @@ public class EfCoreCarTypeRepository(AppDbContext dbContext) : ICarTypeRepositor
     {
         var carTypeToUpdate = await _dbContext.CarTypes.FindAsync(carType.Id);
         if (carTypeToUpdate is null) return null;
-        carTypeToUpdate = carType;
-        _dbContext.CarTypes.Update(carTypeToUpdate);
+        _dbContext.Entry(carTypeToUpdate).CurrentValues.SetValues(carType);
+        
         await _dbContext.SaveChangesAsync();
         return carTypeToUpdate;
     }

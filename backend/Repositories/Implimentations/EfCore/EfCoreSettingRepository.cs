@@ -56,9 +56,8 @@ public class EfCoreSettingRepository(AppDbContext dbContext) : ISettingRepositor
         var settingToUpdate = await _dbContext.Settings.FindAsync(setting.Id);
         
         if (settingToUpdate is null) return null;
-
-        settingToUpdate = setting;
-        _dbContext.Settings.Update(settingToUpdate);
+        
+        _dbContext.Entry(settingToUpdate).CurrentValues.SetValues(setting);
         await _dbContext.SaveChangesAsync();
         return settingToUpdate;
     }
