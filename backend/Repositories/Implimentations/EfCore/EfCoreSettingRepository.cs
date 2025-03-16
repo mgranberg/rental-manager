@@ -1,5 +1,7 @@
 using backend.Data;
 using backend.Repositories.Interfaces;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Models.DB;
 
@@ -22,13 +24,9 @@ public class EfCoreSettingRepository(AppDbContext dbContext) : ISettingRepositor
         return settings;
     }
 
-    public async Task<Setting> DeleteAsync(int id)
+    public Task<Setting?> DeleteAsync(int id)
     {
-        var setting = await _dbContext.Settings.FindAsync(id);
-        if (setting == null) throw new Exception("Setting not found");
-        _dbContext.Settings.Remove(setting);
-        await _dbContext.SaveChangesAsync();
-        return setting;
+        throw new NotImplementedException();
     }
 
     public async Task<IEnumerable<Setting>> DeleteRangeAsync(IEnumerable<Setting> settings)
@@ -43,24 +41,22 @@ public class EfCoreSettingRepository(AppDbContext dbContext) : ISettingRepositor
         return await _dbContext.Settings.ToListAsync();
     }
 
-    public async Task<Setting> GetByIdAsync(int id)
+    public async Task<Setting?> GetByIdAsync(int id)
     {
-        var res = await _dbContext.Settings.FindAsync(id);
-        if (res == null) throw new Exception("Setting not found");
-        return res;
+        return await _dbContext.Settings.FindAsync(id);
     }
 
-    public async Task<Setting> GetFirstAsync()
+    public async Task<Setting?> GetFirstAsync()
     {
-        var setting = await _dbContext.Settings.FirstOrDefaultAsync();
-        if (setting == null) throw new Exception("Setting not found");
-        return setting;
+        return await _dbContext.Settings.FirstOrDefaultAsync();
     }
 
-    public async Task<Setting> UpdateAsync(Setting setting)
+    public async Task<Setting?> UpdateAsync(Setting setting)
     {
         var settingToUpdate = await _dbContext.Settings.FindAsync(setting.Id);
-        if (settingToUpdate == null) throw new Exception("Setting not found");
+        
+        if (settingToUpdate is null) return null;
+
         settingToUpdate = setting;
         _dbContext.Settings.Update(settingToUpdate);
         await _dbContext.SaveChangesAsync();

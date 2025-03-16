@@ -70,6 +70,7 @@ public class CarService(ICarRepository carRepository, IBookingRepository booking
             {
                 carResponse.BookingId = booking.Id;
             }
+
             carsToReturn.Add(carResponse);
         }
 

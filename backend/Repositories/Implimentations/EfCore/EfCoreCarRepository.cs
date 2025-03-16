@@ -22,10 +22,10 @@ public class EfCoreCarRepository(AppDbContext dbContext) : ICarRepository
         return cars;
     }
 
-    public async Task<Car> DeleteAsync(int id)
+    public async Task<Car?> DeleteAsync(int id)
     {
         var car = await _dbContext.Cars.FindAsync(id);
-        if (car == null) throw new Exception("Car not found");
+        if (car is null) return null;
         _dbContext.Cars.Remove(car);
         await _dbContext.SaveChangesAsync();
         return car;
@@ -51,22 +51,36 @@ public class EfCoreCarRepository(AppDbContext dbContext) : ICarRepository
             .ToListAsync();
     }
 
-    public async Task<Car> GetByIdAsync(int id)
+    public async Task<Car?> GetByIdAsync(int id)
     {
-        var car = await _dbContext.Cars.FindAsync(id);
-        if (car == null) throw new Exception("Car not found");
-        return car;
+        return await _dbContext.Cars.FindAsync(id);
     }
 
-    public Task<Car> GetByLicensePlateAsync(string licensePlate)
+    public async Task<Car?> GetByIdWithCartypeWithFueltypeAsync(int id)
     {
-        throw new NotImplementedException();
+        return await _dbContext.Cars
+            .Include(c => c.CarType)
+            .Include(c => c.FuelType)
+            .FirstOrDefaultAsync(c => c.Id == id);
     }
 
-    public async Task<Car> UpdateAsync(Car car)
+    public async Task<Car?> GetByLicancePlateWithCarTypeWithFuelTypeAsync(string licensePlate)
+    {
+        return await _dbContext.Cars
+            .Include(c => c.CarType)
+            .Include(c => c.FuelType)
+            .FirstOrDefaultAsync(c => c.LicensePlate == licensePlate);
+    }
+
+    public async Task<Car?> GetByLicensePlateAsync(string licensePlate)
+    {
+        return await _dbContext.Cars.FirstOrDefaultAsync(c => c.LicensePlate == licensePlate);
+    }
+
+    public async Task<Car?> UpdateAsync(Car car)
     {
         var carToUpdate = await _dbContext.Cars.FindAsync(car.Id);
-        if (carToUpdate == null) throw new Exception("Car not found");
+        if (carToUpdate is null) return null;
         carToUpdate = car;
         _dbContext.Cars.Update(carToUpdate);
         await _dbContext.SaveChangesAsync();

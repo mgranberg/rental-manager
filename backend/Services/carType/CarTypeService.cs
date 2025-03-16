@@ -13,12 +13,12 @@ public class CarTypeService(ICarTypeRepository carTypeRepository) : ICarTypeServ
         return await _carTypeRepository.CreateAsync(carType);
     }
 
-    public async Task<CarType> DeleteCarTypeAsync(int carTypeId)
+    public async Task<CarType?> DeleteCarTypeAsync(int carTypeId)
     {
         return await _carTypeRepository.DeleteAsync(carTypeId);
     }
 
-    public async Task<CarType> GetCarTypeAsync(int carTypeId)
+    public async Task<CarType?> GetCarTypeAsync(int carTypeId)
     {
         return await _carTypeRepository.GetByIdAsync(carTypeId);
     }
@@ -28,7 +28,7 @@ public class CarTypeService(ICarTypeRepository carTypeRepository) : ICarTypeServ
         return await _carTypeRepository.GetAllAsync();
     }
 
-    public async Task<CarType> UpdateCarTypeAsync(CarType carType)
+    public async Task<CarType?> UpdateCarTypeAsync(CarType carType)
     {
         return await _carTypeRepository.UpdateAsync(carType);
     }

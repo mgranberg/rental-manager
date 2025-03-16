@@ -23,10 +23,10 @@ namespace backend.Repositories.Implimentations
             return fuelTypes;
         }
 
-        public async Task<FuelType> DeleteAsync(int id)
+        public async Task<FuelType?> DeleteAsync(int id)
         {
             var fuelType = await _dbContext.FuelTypes.FindAsync(id);
-            if (fuelType == null) throw new Exception("FuelType not found");
+            if (fuelType is null) return null;
             _dbContext.FuelTypes.Remove(fuelType);
             await _dbContext.SaveChangesAsync();
             return fuelType;
@@ -44,17 +44,17 @@ namespace backend.Repositories.Implimentations
             return await _dbContext.FuelTypes.ToListAsync();
         }
 
-        public async Task<FuelType> GetByIdAsync(int id)
+        public async Task<FuelType?> GetByIdAsync(int id)
         {
             var fuelType = await _dbContext.FuelTypes.FindAsync(id);
-            if (fuelType == null) throw new Exception("FuelType not found");
+            if (fuelType is null) return null;
             return fuelType;
         }
 
-        public async Task<FuelType> UpdateAsync(FuelType fuelType)
+        public async Task<FuelType?> UpdateAsync(FuelType fuelType)
         {
             var fuelTypeToUpdate = await _dbContext.FuelTypes.FindAsync(fuelType.Id);
-            if (fuelTypeToUpdate == null) throw new Exception("FuelType not found");
+            if (fuelTypeToUpdate is null) return null;
             _dbContext.FuelTypes.Update(fuelType);
             await _dbContext.SaveChangesAsync();
             return fuelType;

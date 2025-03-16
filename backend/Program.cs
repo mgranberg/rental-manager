@@ -46,6 +46,7 @@ builder.Services.AddScoped<ISeedService, SeedService>();
 builder.Services.AddScoped<IBookingService, BookingService>();
 builder.Services.AddScoped<ICarService, CarService>();
 builder.Services.AddScoped<ICarTypeService, CarTypeService>();
+builder.Services.AddScoped<ISettingService, SettingService>();
 
 var app = builder.Build();
 

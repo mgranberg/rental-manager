@@ -13,37 +13,47 @@ public static class CarTypesEndpoints
         });
         app.MapGet("/cartypes/{carTypeId:int}", async (ICarTypeService carTypeService, int carTypeId) =>
         {
-            // TODO: validate carTypeId
-            return await carTypeService.GetCarTypeAsync(carTypeId);
+            var carType = await carTypeService.GetCarTypeAsync(carTypeId);
+            if (carType is null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(carType);
         });
 
         app.MapPost("/cartypes", async (ICarTypeService carTypeService, CarType carType) =>
         {
-            if (carType.Id != 0)
-            {
-                return Results.BadRequest("Id must be 0");
-            }
-
             if (carType.Multiplier < 1)
             {
                 return Results.BadRequest("Multiplier must be greater than 1");
             }
 
-            if (carType.Name == null)
+            if (carType.Name is null)
             {
                 return Results.BadRequest("Name must not be null");
             }
-            return Results.Ok(await carTypeService.AddCarTypeAsync(carType));
+
+            return Results.Created("/CarTypes", await carTypeService.AddCarTypeAsync(carType));
         });
 
         app.MapPut("/cartypes", async (ICarTypeService carTypeService, CarType carType) =>
         {
-            return await carTypeService.UpdateCarTypeAsync(carType);
+            var res =  await carTypeService.UpdateCarTypeAsync(carType);
+            if (res is null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(res);
         });
 
         app.MapDelete("/cartypes/{carTypeId:int}", async (ICarTypeService carTypeService, int carTypeId) =>
         {
-            return await carTypeService.DeleteCarTypeAsync(carTypeId);
+            var res = await carTypeService.DeleteCarTypeAsync(carTypeId);
+            if (res is null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(res);
         });
     }
 }

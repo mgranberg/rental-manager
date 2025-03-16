@@ -29,10 +29,10 @@ public class EfCoreCarTypeRepository(AppDbContext dbContext) : ICarTypeRepositor
         return carTypes;
     }
 
-    public async Task<CarType> DeleteAsync(int id)
+    public async Task<CarType?> DeleteAsync(int id)
     {
         var carType = await _dbContext.CarTypes.FindAsync(id);
-        if (carType == null) throw new Exception("CarType not found");
+        if (carType is null) return null;
         _dbContext.CarTypes.Remove(carType);
         await _dbContext.SaveChangesAsync();
         return carType;
@@ -43,17 +43,15 @@ public class EfCoreCarTypeRepository(AppDbContext dbContext) : ICarTypeRepositor
         return await _dbContext.CarTypes.ToListAsync();
     }
 
-    public async Task<CarType> GetByIdAsync(int id)
+    public async Task<CarType?> GetByIdAsync(int id)
     {
-        var carType = await _dbContext.CarTypes.FindAsync(id);
-        if (carType == null) throw new Exception("CarType not found");
-        return carType;
+        return await _dbContext.CarTypes.FindAsync(id);
     }
 
-    public async Task<CarType> UpdateAsync(CarType carType)
+    public async Task<CarType?> UpdateAsync(CarType carType)
     {
         var carTypeToUpdate = await _dbContext.CarTypes.FindAsync(carType.Id);
-        if (carTypeToUpdate == null) throw new Exception("CarType not found");
+        if (carTypeToUpdate is null) return null;
         carTypeToUpdate = carType;
         _dbContext.CarTypes.Update(carTypeToUpdate);
         await _dbContext.SaveChangesAsync();

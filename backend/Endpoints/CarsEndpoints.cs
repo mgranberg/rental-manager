@@ -1,7 +1,4 @@
-using backend.Data;
 using backend.Services;
-using Microsoft.EntityFrameworkCore;
-using Models.DB;
 
 namespace backend.Endpoints;
 public static class CarsEndpoints
@@ -13,10 +10,9 @@ public static class CarsEndpoints
             return await carService.GetCarsAsync();
         });
 
-        app.MapPost("/cars/availableCars", async (ICarService carService) =>
+        app.MapGet("/cars/availableCars", async (ICarService carService) =>
         {
             return await carService.GetAvailableCarsAsync();
         });
-
     }
 }

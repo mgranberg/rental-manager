@@ -1,7 +1,4 @@
-using backend.Data;
-using backend.Repositories.Interfaces;
 using backend.Services;
-using Microsoft.EntityFrameworkCore;
 using Models.DB;
 
 namespace backend.Endpoints;
@@ -12,20 +9,22 @@ public static class SettingsEndpoint
     {
         app.MapGet("/settings", async (ISettingService settingService) =>
         {
-            return await settingService.GetFirstSettingAsync();
-        });
-
-        app.MapPut("/settings", async (ISettingRepository settingRepository, Setting setting) =>
-        {
-            var settingToUpdate = await settingRepository.GetByIdAsync(setting.Id);
-            if (settingToUpdate == null)
+            var setting =  await settingService.GetFirstSettingAsync();
+            if (setting is null)
             {
                 return Results.NotFound();
             }
+            return Results.Ok(setting);
+        });
 
-            settingToUpdate = setting;
-            await settingRepository.UpdateAsync(settingToUpdate);
-            return Results.Ok();
+        app.MapPut("/settings", async (ISettingService settingService, Setting setting) =>
+        {
+            var settingToUpdate = await settingService.UpdateSettingAsync(setting);
+            if (settingToUpdate is null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(settingToUpdate);
         });
     }
 }

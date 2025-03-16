@@ -1,3 +1,4 @@
+using Models.DB;
 using NUnit.Framework;
 namespace RentalManager.Tests.HelperTests;
 public class PriceHelperTest

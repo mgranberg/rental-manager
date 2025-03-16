@@ -1,8 +1,6 @@
-using backend.Data;
+using backend.DTOs;
+using backend.helpers;
 using backend.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Models.DB;
 
 namespace backend.Endpoints;
 public static class BookingsEndpoint
@@ -18,7 +16,7 @@ public static class BookingsEndpoint
         {
             var booking = await bookingService.GetBookingAsync(id);
 
-            if (booking == null)
+            if (booking is null)
             {
                 return Results.NotFound();
             }
@@ -27,53 +25,34 @@ public static class BookingsEndpoint
 
         app.MapPost("/bookings", async (IBookingService bookingService, AddBookingRequest bookingRequest) =>
         {
-            if (bookingRequest == null)
+            if (bookingRequest is null)
             {
                 return Results.BadRequest("Invalid request body");
+            }
+
+            if (!Validator.IsValidSsn(bookingRequest.CustomerSsn))
+            {
+                return Results.BadRequest("Invalid SSN");
             }
 
             var result = await bookingService.CreateBookingAsync(bookingRequest);
             return Results.Created($"/bookings/{result.Id}", result);
         });
 
-        app.MapPost("/bookings/return/{identifier}", async (HttpContext context) =>
+        app.MapPut("/bookings/return", async (IBookingService bookingService, ReturnBookingRequest returnBookingRequest) =>
         {
-            var dbContext = context.RequestServices.GetRequiredService<AppDbContext>();
-            var bookingService = context.RequestServices.GetRequiredService<IBookingService>();
-            var identifier = context.Request.RouteValues["identifier"] as string;
-            var bookingRequest = await context.Request.ReadFromJsonAsync<ReturnBookingRequest>();
 
-            if (bookingRequest == null)
+            if (returnBookingRequest is null)
             {
                 return Results.BadRequest("Invalid request body");
             }
 
-            Booking? bookingToReturn = null;
-            if (int.TryParse(identifier, out var id))
-            {
-                bookingToReturn = await dbContext.Bookings.Include(b => b.Car).Include(b => b.CarType).FirstOrDefaultAsync(b => b.Id == id);
-            }
-            else
-            {
-                bookingToReturn = await dbContext.Bookings.Include(b => b.Car).Include(b => b.CarType).FirstOrDefaultAsync(b => b.BookingNumber == identifier);
-            }
+            var result = await bookingService.ReturnBookingAsync(returnBookingRequest);
 
-            if (bookingToReturn == null)
+            if (result is null)
             {
                 return Results.NotFound();
             }
-
-            if (bookingToReturn.Status != BookingStatus.Rented)
-            {
-                return Results.BadRequest("Booking is not currently rented");
-            }
-
-            if (bookingToReturn.Car.Mileage > bookingRequest.ReturnMileage)
-            {
-                return Results.BadRequest($"Ending mileage cannot be less than starting mileage of {bookingToReturn.Car.Mileage} km");
-            }
-
-            var result = await bookingService.ReturnBookingAsync(bookingToReturn, bookingRequest.ReturnMileage);
             return Results.Ok(result);
         });
     }

@@ -15,6 +15,8 @@ import { useCarsStore } from '~/stores/car.store';
 import type { Car } from '~/types/Car.type';
 
 const { data, pending, error, refresh } = await useFetch<Car[]>('/api/cars');
+console.log(error.value);
+
 const store = useCarsStore();
 store.cars = data.value as Car[];
 const menuItems = [[

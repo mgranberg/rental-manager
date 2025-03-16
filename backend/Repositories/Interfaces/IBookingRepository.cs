@@ -4,7 +4,10 @@ namespace backend.Repositories.Interfaces;
 
 public interface IBookingRepository : IGenericRepository<Booking> 
 {
-    Task<Booking> GetByLicensePlateAsync(string licensePlate);
-    Task<Booking> GetRentedByCarIdAsync(int carId);
+    Task<Booking?> GetRentedByCarIdAsync(int carId);
     Task<IEnumerable<int>> GetRentedCarIdsAsync();
+    Task<IEnumerable<Booking>> GetAllWithCarAndCarTypeAsync();
+    Task<Booking?> GetWithCarAndCarTypeIdAsync(int bookingId);
+    Task<Booking?> GetWithCarAndCarTypeBookingNoAsync(string bookingNumber);
+    
 }

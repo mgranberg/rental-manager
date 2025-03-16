@@ -60,12 +60,11 @@ watch(isOpen, (val) => {
 const startDate = new Date();
 const endDate = new Date(new Date().setDate(startDate.getDate() + 2));
 const date = ref([startDate, endDate]);
-const { data: availableCars, status, error, refresh } = await useFetch<Car[]>('/api/cars', {
+
+
+const { data: availableCars, status, error, refresh } = await useFetch<Car[]>('/api/cars/availableCars', {
   method: 'get',
   watch: [date],
-  transform: (data) => data.filter((car) => {
-    return !car.bookingId;
-  })
 })
 
 const rentCar = (car: Car) => {

@@ -22,10 +22,10 @@ public class EfCoreBookingRepository(AppDbContext dbContext) : IBookingRepositor
         return bookings;
     }
 
-    public async Task<Booking> DeleteAsync(int id)
+    public async Task<Booking?> DeleteAsync(int id)
     {
         var booking = await _dbContext.Bookings.FindAsync(id);
-        if (booking == null) throw new Exception("Booking not found");
+        if (booking is null) return null;
         _dbContext.Bookings.Remove(booking);
         await _dbContext.SaveChangesAsync();
         return booking;
@@ -43,24 +43,25 @@ public class EfCoreBookingRepository(AppDbContext dbContext) : IBookingRepositor
         return await _dbContext.Bookings.ToListAsync();
     }
 
-    public async Task<Booking> GetByIdAsync(int id)
+    public async Task<IEnumerable<Booking>> GetAllWithCarAndCarTypeAsync()
+    {
+        return await _dbContext.Bookings
+            .Include(b => b.Car)
+            .ThenInclude(c => c.CarType)
+            .ToListAsync();        
+    }
+
+    public async Task<Booking?> GetByIdAsync(int id)
     {
         var booking = await _dbContext.Bookings.FindAsync(id);
-        if (booking == null) throw new Exception("Booking not found");
+        if (booking is null) return null;
         return booking;
     }
 
-    public async Task<Booking> GetByLicensePlateAsync(string licensePlate)
-    {
-        var booking = await _dbContext.Bookings.FirstOrDefaultAsync(b => b.Car.LicensePlate.ToLower() == licensePlate.ToLower());
-        if (booking == null) throw new Exception("Booking not found");
-        return booking;
-    }
-
-    public async Task<Booking> GetRentedByCarIdAsync(int carId)
+    public async Task<Booking?> GetRentedByCarIdAsync(int carId)
     {
         var booking = await _dbContext.Bookings.FirstOrDefaultAsync(b => b.CarId == carId && b.Status == BookingStatus.Rented);
-        if (booking == null) throw new Exception("Booking not found");
+        if (booking is null) return null;
         return booking;
     }
 
@@ -72,10 +73,40 @@ public class EfCoreBookingRepository(AppDbContext dbContext) : IBookingRepositor
             .ToListAsync();
     }
 
-    public async Task<Booking> UpdateAsync(Booking booking)
+    public async Task<Booking?> GetWithCarAndCarTypeAsync(int bookingId)
+    {
+        var booking = await _dbContext.Bookings
+            .Include(b => b.Car)
+            .ThenInclude(c => c.CarType)
+            .FirstOrDefaultAsync(b => b.Id == bookingId);
+        if (booking is null) return null;
+        return booking;        
+    }
+
+    public async Task<Booking?> GetWithCarAndCarTypeBookingNoAsync(string bookingNumber)
+    {
+        var booking = await _dbContext.Bookings
+            .Include(b => b.Car)
+            .ThenInclude(c => c.CarType)
+            .FirstOrDefaultAsync(b => b.BookingNumber == bookingNumber);
+        if (booking is null) return null;
+        return booking;
+    }
+
+    public async Task<Booking?> GetWithCarAndCarTypeIdAsync(int bookingId)
+    {
+        var booking = await _dbContext.Bookings
+            .Include(b => b.Car)
+            .ThenInclude(c => c.CarType)
+            .FirstOrDefaultAsync(b => b.Id == bookingId);
+        if (booking is null) return null;
+        return booking;
+    }
+
+    public async Task<Booking?> UpdateAsync(Booking booking)
     {
         var bookingToUpdate = await _dbContext.Bookings.FindAsync(booking.Id);
-        if (bookingToUpdate == null) throw new Exception("Booking not found");
+        if (bookingToUpdate is null) return null;
         bookingToUpdate = booking;
         _dbContext.Bookings.Update(bookingToUpdate);
         await _dbContext.SaveChangesAsync();
