@@ -88,9 +88,20 @@ public class BookingService(IBookingRepository bookingRepository, ISettingReposi
         {
             throw new Exception("Car not found");
         }
+
+        if (car.Mileage > booking.EndingMileage)
+        {
+            throw new Exception("Mileage is lower than the starting mileage");
+        }
+        
         car.Mileage = booking.EndingMileage;
         await _carRepository.UpdateAsync(car);
 
         return booking;
+    }
+
+    public async Task<Booking?> GetBookingByBookingNumberAsync(string bookingNumber)
+    {
+        return await _bookingRepository.GetWithCarAndCarTypeBookingNoAsync(bookingNumber);
     }
 }

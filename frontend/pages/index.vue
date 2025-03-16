@@ -14,10 +14,6 @@
 import { useCarsStore } from '~/stores/car.store';
 import type { Car } from '~/types/Car.type';
 
-const { data, status, error, refresh } = await useFetch<Car[]>('/api/cars');
-
-const store = useCarsStore();
-store.cars = data.value as Car[];
 const menuItems = [[
   {
     label: 'Available cars',
@@ -34,6 +30,11 @@ const menuItems = [[
       label: 'Settings',
       icon: 'i-uil-cog',
       to: '/settings'
+    }],
+    [{
+      label: 'receipts',
+      icon: 'i-uil-cog',
+      to: '/receipt'
     }]
 ]
 

@@ -23,6 +23,17 @@ public static class BookingsEndpoint
             return Results.Ok(booking);
         });
 
+        app.MapGet("/bookings/bookingNumber/{bookingNumber}", async (IBookingService bookingService, string bookingNumber) =>
+        {
+            var booking = await bookingService.GetBookingByBookingNumberAsync(bookingNumber);
+
+            if (booking is null)
+            {
+                return Results.NotFound();
+            }
+            return Results.Ok(booking);
+        });
+
         app.MapPost("/bookings", async (IBookingService bookingService, AddBookingRequest bookingRequest) =>
         {
             if (bookingRequest is null)

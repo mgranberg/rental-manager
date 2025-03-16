@@ -23,24 +23,28 @@
       </div>
   
     </UCard>
-    <UCard>
-      <template #header>
-        <h1 class="text-3xl">
-          Settings
-        </h1>      
-      </template>
-      <div class="grid grid-cols-2 gap-4" v-if="settings">
-        <UFormGroup label="Base daily fee">
-          <UInput v-model="settings.baseDailyFee" type="number" />
-        </UFormGroup>
-        <UFormGroup label="Base mileage fee">
-          <UInput v-model="settings.kmFee" type="number" />
-        </UFormGroup>
-      </div>
-      <template #footer>
-        <UButton color="primary" @click="updateSettings">Update</UButton>      
-      </template>
-    </UCard>
+    <template v-if="settings">
+      <UForm :state="settings" @submit="updateSettings">
+      <UCard>
+        <template #header>
+          <h1 class="text-3xl">
+            Settings
+          </h1>      
+        </template>
+        <div class="grid grid-cols-2 gap-4" v-if="settings">
+            <UFormGroup label="Base daily fee">
+              <UInput v-model="settings.baseDailyFee" type="number" step="any" :min="1"/>
+            </UFormGroup>
+            <UFormGroup label="Base mileage fee">
+              <UInput v-model="settings.kmFee" type="number" step="any" :min="1" />
+            </UFormGroup>
+          </div>
+          <template #footer>
+            <UButton color="primary" type="submit">Update</UButton>      
+          </template>
+        </UCard>
+      </UForm>
+    </template>
   </div>
 </template>
 
@@ -60,9 +64,12 @@ const updateSettings = async () => {
   await $fetch('/api/settings', {
     method: 'POST',
     body: settings.value
+  }).then(() => {
+    settingsRefresh();
+    toast.add({ title: 'Settings Updated'});
+  }).catch(e => {
+    toast.add({ title: 'Error', description: e.message, color: 'red' });
   });
-  settingsRefresh();
-  toast.add({ title: 'Settings Updated'});
 }
 const { data: cartypes, status, error, refresh } = await useFetch<CarType[]>('/api/cartypes');
 const { data: settings, status: settingsStatus, error: settingsError, refresh: settingsRefresh } = await useFetch<Settings>('/api/settings');

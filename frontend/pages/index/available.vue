@@ -18,7 +18,7 @@
           <VueDatePicker v-model="date" :range="{fixedStart: true}"></VueDatePicker>
         </UFormGroup>
         <UFormGroup label="Social security number">
-          <UInput v-model="customerSsn" placeholder="YYYYMMDD-XXXX" />
+          <UInput v-model="customerSsn" placeholder="YYMMDD-XXXX" />
         </UFormGroup>
       </div>
       <div v-if="bookingData.status == 'pending'" class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
@@ -44,6 +44,7 @@
 <script lang="ts" setup>
 import type { Car } from '~/types/Car.type';
 
+const emit = defineEmits(['rent']);
 const bookingData = ref({
   customerSsn: '',
   status: 'none' as 'none' | 'pending' | 'error' | 'success',
@@ -62,7 +63,7 @@ const endDate = new Date(new Date().setDate(startDate.getDate() + 2));
 const date = ref([startDate, endDate]);
 
 
-const { data: availableCars, status, error, refresh } = await useFetch('/api/availableCars');
+const { data: availableCars, status, error, refresh } = await useFetch<Car[]>('/api/availableCars');
 console.log(availableCars);
 console.log(error);
 
@@ -98,6 +99,7 @@ const onPublishBooking = async () => {
     bookingData.value.selectedCar = null;
     bookingData.value.customerSsn = '';
     bookingData.value.error = '';
+    emit('rent');
     refresh();
   }).catch((error) => {
     console.log(error);
