@@ -23,6 +23,8 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 var repo = "efCore";
 
+// Chose repository
+
 switch (repo)
 {
     case "efCore":
@@ -34,10 +36,10 @@ switch (repo)
         
         break;
 
-    case "inMemory":
-        // builder.Services.AddScoped<ICarTypeRepository, InMemoryCarTypeRepository>();
-        // builder.Services.AddScoped<ICarRepository, InMemoryCarRepository>();
-        // builder.Services.AddScoped<IBookingRepository, InMemoryBookingRepository>();
+    case "other":
+        // builder.Services.AddScoped<ICarTypeRepository, OtherCarTypeRepository>();
+        // builder.Services.AddScoped<ICarRepository, OtherCarRepository>();
+        // builder.Services.AddScoped<IBookingRepository, OtherBookingRepository>();
         break;
 }
 
